@@ -1,0 +1,212 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  IMPORTER
+  REGULATOR
+  ADMIN
+}
+
+enum CompanyType {
+  IMPORTER
+  SUPPLIER
+}
+
+enum OrderStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  SHIPPED
+  IN_TRANSIT
+  ARRIVED
+  CLEARED
+}
+
+enum ShipmentStatus {
+  LOADING
+  DEPARTED
+  IN_TRANSIT
+  APPROACHING
+  ARRIVED
+}
+
+enum DocumentType {
+  PROFORMA_INVOICE
+  IMPORT_LICENSE
+  CERT_OF_ORIGIN
+  BILL_OF_LADING
+  PHYTO_CERT
+  OTHER
+}
+
+enum AlertType {
+  SHORTAGE_RISK
+  CONCENTRATION_RISK
+  ARRIVAL_IMMINENT
+  STATUS_CHANGE
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Company {
+  id                 String      @id @default(cuid())
+  name               String
+  registrationNumber String?     @map("registration_number")
+  type               CompanyType
+  country            String
+  city               String?
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
+
+  users              User[]
+  suppliedOrders     ImportOrder[] @relation("SupplierOrders")
+
+  @@map("companies")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  name          String
+  role          UserRole  @default(IMPORTER)
+  companyId     String?   @map("company_id")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  company       Company?  @relation(fields: [companyId], references: [id])
+  orders        ImportOrder[]
+  documents     Document[]
+  statusChanges OrderStatusLog[]
+
+  @@map("users")
+}
+
+model ImportOrder {
+  id                   String      @id @default(cuid())
+  nafisRef             String      @unique @map("nafis_ref")
+  importerId           String      @map("importer_id")
+  supplierCompanyId    String?     @map("supplier_company_id")
+  status               OrderStatus @default(DRAFT)
+  commodityHsCode      String      @map("commodity_hs_code")
+  commodityName        String      @map("commodity_name")
+  commodityCategory    String?     @map("commodity_category")
+  quantity             Float
+  unit                 String      @default("MT")
+  originCountry        String      @map("origin_country")
+  originPort           String?     @map("origin_port")
+  destinationPort      String      @map("destination_port")
+  estimatedShipDate    DateTime?   @map("estimated_ship_date")
+  estimatedArrivalDate DateTime?   @map("estimated_arrival_date")
+  actualShipDate       DateTime?   @map("actual_ship_date")
+  actualArrivalDate    DateTime?   @map("actual_arrival_date")
+  totalValue           Float?      @map("total_value")
+  currency             String      @default("SAR")
+  supplierName         String?     @map("supplier_name")
+  notes                String?
+  createdAt            DateTime    @default(now()) @map("created_at")
+  updatedAt            DateTime    @updatedAt @map("updated_at")
+
+  importer             User        @relation(fields: [importerId], references: [id])
+  supplierCompany      Company?    @relation("SupplierOrders", fields: [supplierCompanyId], references: [id])
+  documents            Document[]
+  shipment             Shipment?
+  statusLogs           OrderStatusLog[]
+  alerts               Alert[]
+
+  @@index([status])
+  @@index([commodityHsCode])
+  @@index([originCountry])
+  @@index([destinationPort])
+  @@index([estimatedArrivalDate])
+  @@map("import_orders")
+}
+
+model Document {
+  id         String       @id @default(cuid())
+  orderId    String       @map("order_id")
+  type       DocumentType
+  fileUrl    String       @map("file_url")
+  fileName   String       @map("file_name")
+  fileSize   Int          @map("file_size")
+  uploadedBy String       @map("uploaded_by")
+  uploadedAt DateTime     @default(now()) @map("uploaded_at")
+
+  order      ImportOrder  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  uploader   User         @relation(fields: [uploadedBy], references: [id])
+
+  @@map("documents")
+}
+
+model Shipment {
+  id                  String         @id @default(cuid())
+  orderId             String         @unique @map("order_id")
+  vesselName          String?        @map("vessel_name")
+  vesselImo           String?        @map("vessel_imo")
+  vesselMmsi          String?        @map("vessel_mmsi")
+  shippingLine        String?        @map("shipping_line")
+  billOfLadingNumber  String?        @map("bill_of_lading_number")
+  containerNumbers    Json?          @map("container_numbers")
+  departurePort       String?        @map("departure_port")
+  arrivalPort         String?        @map("arrival_port")
+  departedAt          DateTime?      @map("departed_at")
+  eta                 DateTime?
+  arrivedAt           DateTime?      @map("arrived_at")
+  lastKnownLat        Float?         @map("last_known_lat")
+  lastKnownLng        Float?         @map("last_known_lng")
+  lastPositionUpdate  DateTime?      @map("last_position_update")
+  status              ShipmentStatus @default(LOADING)
+  createdAt           DateTime       @default(now()) @map("created_at")
+  updatedAt           DateTime       @updatedAt @map("updated_at")
+
+  order               ImportOrder    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([vesselMmsi])
+  @@index([status])
+  @@map("shipments")
+}
+
+model OrderStatusLog {
+  id         String   @id @default(cuid())
+  orderId    String   @map("order_id")
+  fromStatus String?  @map("from_status")
+  toStatus   String   @map("to_status")
+  changedBy  String   @map("changed_by")
+  reason     String?
+  notes      String?
+  changedAt  DateTime @default(now()) @map("changed_at")
+
+  order      ImportOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [changedBy], references: [id])
+
+  @@map("order_status_logs")
+}
+
+model Alert {
+  id               String        @id @default(cuid())
+  type             AlertType
+  severity         AlertSeverity @default(MEDIUM)
+  title            String
+  message          String
+  relatedOrderId   String?       @map("related_order_id")
+  relatedCommodity String?       @map("related_commodity")
+  isRead           Boolean       @default(false) @map("is_read")
+  readBy           String?       @map("read_by")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  relatedOrder     ImportOrder?  @relation(fields: [relatedOrderId], references: [id])
+
+  @@index([type])
+  @@index([isRead])
+  @@map("alerts")
+}
