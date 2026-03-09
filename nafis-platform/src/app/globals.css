@@ -1,0 +1,196 @@
+@use "@carbon/react" with (
+  $font-path: "@ibm/plex"
+);
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --nafis-primary: #0f62fe;
+  --nafis-success: #198038;
+  --nafis-warning: #f1c21b;
+  --nafis-danger: #da1e28;
+  --nafis-bg: #f4f4f4;
+  --nafis-surface: #ffffff;
+  --nafis-text-primary: #161616;
+  --nafis-text-secondary: #525252;
+  --nafis-border: #e0e0e0;
+}
+
+body {
+  background: var(--nafis-bg);
+  color: var(--nafis-text-primary);
+  font-family: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Carbon overrides for cleaner look */
+.cds--header {
+  background: #161616 !important;
+  border-bottom: none !important;
+}
+
+.cds--side-nav {
+  background: #ffffff !important;
+  border-right: 1px solid var(--nafis-border);
+}
+
+.cds--side-nav__link:hover {
+  background: #e8e8e8 !important;
+}
+
+.cds--side-nav__link--current {
+  background: #e0e0e0 !important;
+}
+
+/* Dashboard card styles - inspired by Zentra reference */
+.nafis-card {
+  background: var(--nafis-surface);
+  border-radius: 12px;
+  border: 1px solid var(--nafis-border);
+  padding: 24px;
+  transition: box-shadow 0.2s ease;
+}
+
+.nafis-card:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.nafis-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.nafis-card-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--nafis-text-secondary);
+  letter-spacing: 0.01em;
+}
+
+.nafis-big-number {
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--nafis-text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.nafis-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #f4f4f4;
+}
+
+.nafis-stat-row:last-child {
+  border-bottom: none;
+}
+
+.nafis-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 24px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.nafis-badge-success {
+  background: #defbe6;
+  color: #198038;
+}
+
+.nafis-badge-warning {
+  background: #fcf4d6;
+  color: #8e6a00;
+}
+
+.nafis-badge-danger {
+  background: #fff1f1;
+  color: #da1e28;
+}
+
+.nafis-badge-info {
+  background: #edf5ff;
+  color: #0043ce;
+}
+
+.nafis-badge-neutral {
+  background: #f4f4f4;
+  color: #525252;
+}
+
+/* Status timeline */
+.nafis-timeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 24px 0;
+}
+
+.nafis-timeline-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.nafis-timeline-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  z-index: 1;
+}
+
+.nafis-timeline-dot.active {
+  background: var(--nafis-primary);
+  box-shadow: 0 0 0 4px rgba(15, 98, 254, 0.15);
+}
+
+.nafis-timeline-dot.completed {
+  background: var(--nafis-success);
+}
+
+.nafis-timeline-line {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  right: -50%;
+  height: 2px;
+  background: #e0e0e0;
+}
+
+.nafis-timeline-line.completed {
+  background: var(--nafis-success);
+}
+
+/* Page header */
+.nafis-page-header {
+  margin-bottom: 32px;
+}
+
+.nafis-page-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--nafis-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.nafis-page-subtitle {
+  font-size: 14px;
+  color: var(--nafis-text-secondary);
+  margin-top: 4px;
+}
+
+/* Leaflet map overrides */
+.leaflet-container {
+  border-radius: 12px;
+  z-index: 0;
+}
