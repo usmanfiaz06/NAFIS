@@ -10,10 +10,14 @@ import {
   Notification,
   UserMultiple,
   CategoryNewEach,
+  Security,
+  Analytics,
 } from "@carbon/icons-react";
 
 const importerNav = [
   { href: "/dashboard", label: "Dashboard", icon: Dashboard },
+  { href: "/food-security", label: "Food Security", icon: Security },
+  { href: "/analytics", label: "Analytics", icon: Analytics },
   { href: "/orders", label: "Import Orders", icon: ShoppingCart },
   { href: "/tracking", label: "Vessel Tracking", icon: Map },
   { href: "/alerts", label: "Alerts", icon: Notification },
@@ -21,6 +25,8 @@ const importerNav = [
 
 const regulatorNav = [
   { href: "/dashboard", label: "Control Tower", icon: Dashboard },
+  { href: "/food-security", label: "Food Security", icon: Security },
+  { href: "/analytics", label: "Analytics", icon: Analytics },
   { href: "/orders", label: "All Orders", icon: ShoppingCart },
   { href: "/tracking", label: "Vessel Tracking", icon: Map },
   { href: "/alerts", label: "Alerts", icon: Notification },
@@ -28,6 +34,8 @@ const regulatorNav = [
 
 const adminNav = [
   { href: "/dashboard", label: "Control Tower", icon: Dashboard },
+  { href: "/food-security", label: "Food Security", icon: Security },
+  { href: "/analytics", label: "Analytics", icon: Analytics },
   { href: "/orders", label: "All Orders", icon: ShoppingCart },
   { href: "/tracking", label: "Vessel Tracking", icon: Map },
   { href: "/alerts", label: "Alerts", icon: Notification },
